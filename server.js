@@ -6,13 +6,20 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Debug: Check if environment variables are loaded
+console.log('🔍 Environment Debug:');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('PORT:', process.env.PORT);
+console.log('API Key exists:', !!process.env.OPENAI_API_KEY);
+console.log('API Key length:', process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : 0);
+console.log('API Key starts with sk-:', process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.startsWith('sk-') : false);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public')); // Serve static files from public directory
+app.use(express.static('public'));
 
 // OpenAI API configuration
-require('dotenv').config();
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
@@ -53,6 +60,29 @@ async function callOpenAI(messages, persona) {
   }
 }
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Sheldon & Missy Conversation Server',
+    status: 'running',
+    apiKeyConfigured: !!OPENAI_API_KEY,
+    endpoints: {
+      health: '/health',
+      conversation: 'POST /start-conversation'
+    }
+  });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'Server is running', 
+    timestamp: new Date().toISOString(),
+    apiKeyConfigured: !!OPENAI_API_KEY,
+    port: PORT
+  });
+});
+
 // Main conversation endpoint
 app.post('/start-conversation', async (req, res) => {
   try {
@@ -66,7 +96,7 @@ app.post('/start-conversation', async (req, res) => {
       return res.status(500).json({ error: 'OpenAI API key not configured' });
     }
 
-    console.log(`Starting conversation about: ${topic}`);
+    console.log(`🚀 Starting conversation about: ${topic}`);
     
     // Initialize conversation
     const conversation = [];
@@ -107,7 +137,7 @@ app.post('/start-conversation', async (req, res) => {
       await new Promise(resolve => setTimeout(resolve, 500));
     }
 
-    console.log('Conversation completed successfully');
+    console.log('✅ Conversation completed successfully');
     res.json({ 
       success: true, 
       topic: topic,
@@ -115,7 +145,7 @@ app.post('/start-conversation', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error generating conversation:', error);
+    console.error('❌ Error generating conversation:', error);
     res.status(500).json({ 
       error: 'Failed to generate conversation',
       details: error.message 
@@ -123,17 +153,17 @@ app.post('/start-conversation', async (req, res) => {
   }
 });
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'Server is running', timestamp: new Date().toISOString() });
-});
-
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
+  console.log(`🎯 Server running on port ${PORT}`);
+  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  console.log(`🔗 Root endpoint: http://localhost:${PORT}/`);
+  
   if (!OPENAI_API_KEY) {
-    console.warn('WARNING: OPENAI_API_KEY not found in environment variables');
+    console.warn('⚠️  WARNING: OPENAI_API_KEY not found in environment variables');
+    console.warn('Make sure your .env file exists and contains OPENAI_API_KEY=your_key_here');
+  } else {
+    console.log('✅ OpenAI API key loaded successfully');
   }
 });
 
