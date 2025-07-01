@@ -297,10 +297,9 @@
             <div class="input-group">
                 <div class="input-field">
                     <label for="topicInput">Choose a conversation topic:</label>
-                    <input type="text" id="topicInput" placeholder="e.g., Is pineapple on pizza acceptable?" 
-                           value="The best superhero of all time">
+                    <input id="topicInput" placeholder="e.g., Is pineapple on pizza acceptable?" type="text" value="The best superhero of all time">
                 </div>
-                <button id="startBtn" class="start-btn">Start Conversation</button>
+                <button class="start-btn" id="startBtn">Start Conversation</button>
             </div>
         </div>
 
@@ -314,24 +313,21 @@
         </div>
     </div>
 
-    <script>
-        const API_BASE_URL = 'http://localhost:3000'; // Change this to your deployed URL
+    <script type="text/javascript">
+        const API_BASE_URL = 'https://myapp-gilt-nu.vercel.app';
         
         const topicInput = document.getElementById('topicInput');
         const startBtn = document.getElementById('startBtn');
         const chatLog = document.getElementById('chatLog');
 
-        // Focus on input field
         topicInput.focus();
 
-        // Handle Enter key in input field
-        topicInput.addEventListener('keypress', (e) => {
+        topicInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && !startBtn.disabled) {
                 startConversation();
             }
         });
 
-        // Handle start button click
         startBtn.addEventListener('click', startConversation);
 
         async function startConversation() {
@@ -343,14 +339,13 @@
                 return;
             }
 
-            // Disable button and show loading
             startBtn.disabled = true;
             startBtn.textContent = 'Generating...';
             
             showLoading();
 
             try {
-                const response = await fetch(`${API_BASE_URL}/start-conversation`, {
+                const response = await fetch(API_BASE_URL + '/start-conversation', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -369,74 +364,47 @@
                 console.error('Error:', error);
                 showError('Failed to connect to server. Make sure the backend is running!');
             } finally {
-                // Re-enable button
                 startBtn.disabled = false;
                 startBtn.textContent = 'Start Conversation';
             }
         }
 
         function showLoading() {
-            chatLog.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <h3>🧠 Generating conversation...</h3>
-                    <p>Sheldon and Missy are thinking about this topic. This may take a moment.</p>
-                </div>
-            `;
+            chatLog.innerHTML = '<div class="loading"><div class="spinner"></div><h3>🧠 Generating conversation...</h3><p>Sheldon and Missy are thinking about this topic. This may take a moment.</p></div>';
         }
 
         function displayConversation(data) {
-            const resetBtn = `<button class="reset-btn" onclick="resetConversation()">Start New Conversation</button>`;
+            const resetBtn = '<button class="reset-btn" onclick="resetConversation()">Start New Conversation</button>';
             
-            let html = `
-                <div class="conversation-header">
-                    <h3>💬 Conversation Topic</h3>
-                    <p>"${data.topic}"</p>
-                </div>
-            `;
+            let html = '<div class="conversation-header"><h3>💬 Conversation Topic</h3><p>"' + data.topic + '"</p></div>';
 
-            data.conversation.forEach((message, index) => {
+            data.conversation.forEach(function(message, index) {
                 const speakerClass = message.speaker.toLowerCase();
                 const animationDelay = index * 0.2;
                 
-                html += `
-                    <div class="message ${speakerClass}" style="animation-delay: ${animationDelay}s">
-                        <div class="turn-number">Turn ${message.turn}</div>
-                        <div class="speaker">${message.speaker}</div>
-                        <div class="message-text">${message.message}</div>
-                    </div>
-                `;
+                html += '<div class="message ' + speakerClass + '" style="animation-delay: ' + animationDelay + 's">';
+                html += '<div class="turn-number">Turn ' + message.turn + '</div>';
+                html += '<div class="speaker">' + message.speaker + '</div>';
+                html += '<div class="message-text">' + message.message + '</div>';
+                html += '</div>';
             });
 
-            html += `<div style="text-align: center;">${resetBtn}</div>`;
+            html += '<div style="text-align: center;">' + resetBtn + '</div>';
             chatLog.innerHTML = html;
         }
 
         function showError(message) {
-            chatLog.innerHTML = `
-                <div class="error">
-                    <strong>❌ Error:</strong> ${message}
-                </div>
-                <div style="text-align: center;">
-                    <button class="reset-btn" onclick="resetConversation()">Try Again</button>
-                </div>
-            `;
+            chatLog.innerHTML = '<div class="error"><strong>❌ Error:</strong> ' + message + '</div><div style="text-align: center;"><button class="reset-btn" onclick="resetConversation()">Try Again</button></div>';
         }
 
         function resetConversation() {
-            chatLog.innerHTML = `
-                <div style="text-align: center; color: #6c757d; padding: 40px;">
-                    <h3>👆 Enter a topic above and click "Start Conversation"</h3>
-                    <p>Watch as Sheldon and Missy have a 10-message debate about your chosen topic!</p>
-                </div>
-            `;
+            chatLog.innerHTML = '<div style="text-align: center; color: #6c757d; padding: 40px;"><h3>👆 Enter a topic above and click "Start Conversation"</h3><p>Watch as Sheldon and Missy have a 10-message debate about your chosen topic!</p></div>';
             topicInput.focus();
         }
 
-        // Health check on page load
         async function checkServerHealth() {
             try {
-                const response = await fetch(`${API_BASE_URL}/health`);
+                const response = await fetch(API_BASE_URL + '/health');
                 if (response.ok) {
                     console.log('✅ Server is running');
                 }
@@ -445,8 +413,9 @@
             }
         }
 
-        // Check server health when page loads
         checkServerHealth();
     </script>
 </body>
 </html>
+
+
