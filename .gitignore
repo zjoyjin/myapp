@@ -1,1 +1,6 @@
+<<<<<<< HEAD
 .vercel
+=======
+.env
+node_modules/
+>>>>>>> refs/remotes/origin/main

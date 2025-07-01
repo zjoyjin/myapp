@@ -12,6 +12,7 @@ app.use(express.json());
 app.use(express.static('public')); // Serve static files from public directory
 
 // OpenAI API configuration
+require('dotenv').config();
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
