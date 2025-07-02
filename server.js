@@ -4,7 +4,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Debug: Check if environment variables are loaded
 console.log('🔍 Environment Debug:');
@@ -16,7 +16,7 @@ console.log('API Key starts with sk-:', process.env.OPENAI_API_KEY ? process.env
 
 // Middleware
 app.use(cors({
-  origin: '*',
+  origin: ['https://myapp-gilt-nu.vercel.app', 'http://localhost:3000'],
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
@@ -141,7 +141,7 @@ app.post('/start-conversation', async (req, res) => {
       await new Promise(resolve => setTimeout(resolve, 500));
     }
 
-    console.log('✅ Conversation completed successfully');
+    console.log('Conversation completed successfully');
     res.json({ 
       success: true, 
       topic: topic,
@@ -155,6 +155,14 @@ app.post('/start-conversation', async (req, res) => {
       details: error.message 
     });
   }
+});
+
+// Add this endpoint
+app.get('/api/hello', (req, res) => {
+  res.json({ 
+    message: 'Hello from Sheldon & Missy backend!',
+    status: 'connected'
+  });
 });
 
 // Start server
